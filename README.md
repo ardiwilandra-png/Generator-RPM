@@ -1,20 +1,19 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# AI Generator RPM - Panduan Deployment Vercel
 
-# Run and deploy your AI Studio app
+Aplikasi ini telah siap untuk dideploy ke [Vercel](https://vercel.com). Ikuti langkah-langkah di bawah ini untuk mengonlinekan aplikasi Anda.
 
-This contains everything you need to run your app locally.
+## Persiapan
+1. Pastikan Anda memiliki akun di [Vercel](https://vercel.com).
+2. Hubungkan akun GitHub/GitLab/Bitbucket Anda.
 
-View your app in AI Studio: https://ai.studio/apps/983f985c-2634-4b2c-9573-2abdf1def300
+## Langkah Deployment
+1. **Import Project**: Pilih repositori aplikasi ini di dashboard Vercel.
+2. **Framework Preset**: Vercel akan otomatis mendeteksi **Vite**.
+3. **Environment Variables (PENTING)**:
+   Aplikasi ini memerlukan API Key Gemini agar fitur AI dapat bekerja. Di bagian **Environment Variables**, tambahkan:
+   - **Key**: `GEMINI_API_KEY`
+   - **Value**: (Masukkan API Key Google Gemini Anda)
+4. **Deploy**: Klik tombol **Deploy** dan tunggu proses selesai.
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Keamanan
+Perlu dicatat bahwa dalam konfigurasi saat ini, API Key tersebut akan disertakan dalam kode sisi klien (browser) saat proses build. Untuk penggunaan produksi yang lebih publik, disarankan menggunakan sistem backend (Serverless Functions) untuk menyembunyikan API Key tersebut.
