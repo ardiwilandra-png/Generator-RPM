@@ -26,6 +26,8 @@ import {
   Link as LinkIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { RPMData, RPMResult } from './types';
 import { generateRPM } from './services/geminiService';
 
@@ -827,7 +829,9 @@ export default function App() {
                             <span className="font-bold text-[#3B6BB0]">Asesmen Awal</span>
                           </div>
                           <div className="w-[75%] p-4 text-[10pt]">
-                            <div className="html-table-container prose-sm" dangerouslySetInnerHTML={{ __html: result?.asesmen.diagnostik || '' }} />
+                            <div className="markdown-body">
+                              <Markdown remarkPlugins={[remarkGfm]}>{result?.asesmen.diagnostik}</Markdown>
+                            </div>
                           </div>
                         </div>
 
@@ -837,7 +841,9 @@ export default function App() {
                             <span className="font-bold text-[#D6B656]">Asesmen Proses</span>
                           </div>
                           <div className="w-[75%] p-4 text-[10pt]">
-                            <div className="html-table-container prose-sm" dangerouslySetInnerHTML={{ __html: result?.asesmen.formatif || '' }} />
+                            <div className="markdown-body">
+                              <Markdown remarkPlugins={[remarkGfm]}>{result?.asesmen.formatif}</Markdown>
+                            </div>
                           </div>
                         </div>
 
@@ -847,7 +853,9 @@ export default function App() {
                             <span className="font-bold text-[#82B366]">Asesmen Akhir</span>
                           </div>
                           <div className="w-[75%] p-4 text-[10pt]">
-                            <div className="html-table-container prose-sm" dangerouslySetInnerHTML={{ __html: result?.asesmen.sumatif || '' }} />
+                            <div className="markdown-body">
+                              <Markdown remarkPlugins={[remarkGfm]}>{result?.asesmen.sumatif}</Markdown>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -855,18 +863,16 @@ export default function App() {
 
                     <section className="space-y-6">
                       <h2 className="font-bold text-[14pt] border-b-2 border-black pb-1 text-[#3B6BB0]">XIII. REFLEKSI GURU</h2>
-                      <div 
-                        className="html-table-container prose-table:w-full prose-table:border-collapse prose-td:border prose-td:border-black prose-td:p-2 prose-th:p-2"
-                        dangerouslySetInnerHTML={{ __html: result?.refleksiGuru || '' }} 
-                      />
+                      <div className="markdown-body">
+                        <Markdown remarkPlugins={[remarkGfm]}>{result?.refleksiGuru}</Markdown>
+                      </div>
                     </section>
 
                     <section className="space-y-6 pt-6 mb-10">
                       <h2 className="font-bold text-[14pt] border-b-2 border-black pb-1 text-[#3B6BB0]">XIV. REFLEKSI PESERTA DIDIK</h2>
-                      <div 
-                        className="html-table-container prose-table:w-full prose-table:border-collapse prose-td:border prose-td:border-black prose-td:p-2 prose-th:p-2"
-                        dangerouslySetInnerHTML={{ __html: result?.refleksiSiswa || '' }} 
-                      />
+                      <div className="markdown-body">
+                        <Markdown remarkPlugins={[remarkGfm]}>{result?.refleksiSiswa}</Markdown>
+                      </div>
                     </section>
                   </div>
 

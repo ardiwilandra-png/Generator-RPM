@@ -15,10 +15,66 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const genAI = new GoogleGenAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: [
+        {
+          role: "user",
+          parts: [{
+            text: `
+              Kamu adalah pakar kurikulum SD di Indonesia. Buatlah Rencana Pembelajaran Mendalam (RPM) lengkap berdasarkan data berikut:
+              Mata Pelajaran: ${data.mataPelajaran}
+              Fase: ${data.fase}
+              Kelas: ${data.kelas}
+              Materi: ${data.materi}
+              Semester: ${data.semester}
+              Alokasi Waktu: ${data.alokasiWaktu}
+              Model Pembelajaran: ${data.modelPembelajaran}
+              Integrasi Coding: ${data.integrasiCoding ? "Ya" : "Tidak"}
+
+              Gunakan bahasa Indonesia yang profesional, modern, dan mudah dipahami guru SD.
+              Pastikan aktivitas pembelajaran berpusat pada siswa dan mengintegrasikan CT (Computational Thinking) dan Deep Learning.
+              
+              PENTING: Pada bagian "profilLulusan", pilih minimal 3-5 dimensi yang PALING RELEVAN dengan materi. 
+              Wajib mencakup "dimensi" (nama dimensi) dan "penjelasan" (deskripsi singkat 1-2 kalimat).
+              
+              PENTING: Pada bagian "kebiasaanAnak", pilih 1-2 kebiasaan dari "7 Kebiasaan Anak Indonesia Hebat" yang PALING RELEVAN dengan materi.
+              Wajib mencakup "daftar" (array objek dengan nama dan penjelasan).
+              Daftar kebiasaan: Bangun pagi, Beribadah, Berolahraga, Makan sehat dan bergizi, Gemar belajar, Bermasyarakat, Istirahat yang cukup.
+              
+              PENTING: Pada bagian "pengalamanBelajar", buatlah minimal 5 baris/objek dalam array:
+              1. Tahap: AWAL (Pendahuluan)
+              2. Tahap: INTI - Memahami
+              3. Tahap: INTI - Mengaplikasi
+              4. Tahap: INTI - Merefleksi
+              5. Tahap: PENUTUP
+              
+              Kolom "sintaks" harus disesuaikan dengan Model Pembelajaran: ${data.modelPembelajaran}.
+              Misal untuk PBL: Orientasi Masalah, Organisasi Belajar, Penyelidikan, Pengembangan Hasil, Analisis & Evaluasi.
+              Misal untuk PjBL: Pertanyaan Mendasar, Desain Proyek, Jadwal, Monitoring, Menguji Hasil, Evaluasi.
+              
+              Data "kegiatan" harus berupa poin-poin langkah yang detail (misal: 1. Guru menyapa... 2. Siswa mengamati...).
+              
+              PENTING: Pada bagian "asesmen", buatlah konten dalam format MARKDOWN yang sangat detail:
+              1. Diagnostik (Asesmen Awal): Sertakan Jenis (Assessment as Learning), Metode, dan detail aktivitas.
+              2. Formatif (Asesmen Proses): Sertakan Jenis (Assessment for Learning), Metode, dan WAJIB buatkan TABEL RUBRIK PENILAIAN dalam format Markdown (Kolom: Aspek Penilaian, Sangat Baik, Baik, Perlu Bimbingan).
+              3. Sumatif (Asesmen Akhir): Sertakan Jenis (Assessment of Learning), Metode, dan detail tugas/pertanyaan evaluasi.
+              
+              PENTING: Bagian "refleksiGuru" dan "refleksiSiswa" juga harus dalam format MARKDOWN.
+              
+              Tambahkan juga dukungan media pembelajaran:
+              1. gambarIlustrasi: Deskripsi atau narasi singkat tentang gambar yang cocok untuk materi ini.
+              2. videoYoutube: Berikan 1 link video YouTube edukatif yang relevan (jika ada).
+              3. referensiLink: Berikan minimal 2 link sumber belajar tambahan berupa array objek {judul, url}.
+              
+              Berikan respon dalam format JSON yang valid.
+            `
+          }]
+        }
+      ],
+      config: {
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -134,55 +190,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     });
 
-    const prompt = `
-        Kamu adalah pakar kurikulum SD di Indonesia. Buatlah Rencana Pembelajaran Mendalam (RPM) lengkap berdasarkan data berikut:
-        Mata Pelajaran: ${data.mataPelajaran}
-        Fase: ${data.fase}
-        Kelas: ${data.kelas}
-        Materi: ${data.materi}
-        Semester: ${data.semester}
-        Alokasi Waktu: ${data.alokasiWaktu}
-        Model Pembelajaran: ${data.modelPembelajaran}
-        Integrasi Coding: ${data.integrasiCoding ? "Ya" : "Tidak"}
-
-        Gunakan bahasa Indonesia yang profesional, modern, dan mudah dipahami guru SD.
-        Pastikan aktivitas pembelajaran berpusat pada siswa dan mengintegrasikan CT (Computational Thinking) dan Deep Learning.
-        
-        PENTING: Pada bagian "profilLulusan", pilih minimal 3-5 dimensi yang PALING RELEVAN dengan materi. 
-        Wajib mencakup "dimensi" (nama dimensi) dan "penjelasan" (deskripsi singkat 1-2 kalimat).
-        
-        PENTING: Pada bagian "kebiasaanAnak", pilih 1-2 kebiasaan dari "7 Kebiasaan Anak Indonesia Hebat" yang PALING RELEVAN dengan materi.
-        Wajib mencakup "daftar" (array objek dengan nama dan penjelasan).
-        Daftar kebiasaan: Bangun pagi, Beribadah, Berolahraga, Makan sehat dan bergizi, Gemar belajar, Bermasyarakat, Istirahat yang cukup.
-        
-        PENTING: Pada bagian "pengalamanBelajar", buatlah minimal 5 baris/objek dalam array:
-        1. Tahap: AWAL (Pendahuluan)
-        2. Tahap: INTI - Memahami
-        3. Tahap: INTI - Mengaplikasi
-        4. Tahap: INTI - Merefleksi
-        5. Tahap: PENUTUP
-        
-        Kolom "sintaks" harus disesuaikan dengan Model Pembelajaran: ${data.modelPembelajaran}.
-        Misal untuk PBL: Orientasi Masalah, Organisasi Belajar, Penyelidikan, Pengembangan Hasil, Analisis & Evaluasi.
-        Misal untuk PjBL: Pertanyaan Mendasar, Desain Proyek, Jadwal, Monitoring, Menguji Hasil, Evaluasi.
-        
-        Data "kegiatan" harus berupa poin-poin langkah yang detail (misal: 1. Guru menyapa... 2. Siswa mengamati...).
-        
-        PENTING: Pada bagian "asesmen", buatlah konten HTML yang sangat detail:
-        1. Diagnostik (Asesmen Awal): Sertakan Jenis (Assessment as Learning), Metode, dan detail aktivitas.
-        2. Formatif (Asesmen Proses): Sertakan Jenis (Assessment for Learning), Metode, dan WAJIB buatkan TABEL RUBRIK PENILAIAN (Kolom: Aspek Penilaian, Sangat Baik, Baik, Perlu Bimbingan).
-        3. Sumatif (Asesmen Akhir): Sertakan Jenis (Assessment of Learning), Metode, dan detail tugas/pertanyaan evaluasi.
-        
-        Tambahkan juga dukungan media pembelajaran:
-        1. gambarIlustrasi: Deskripsi atau narasi singkat tentang gambar yang cocok untuk materi ini.
-        2. videoYoutube: Berikan 1 link video YouTube edukatif yang relevan (jika ada).
-        3. referensiLink: Berikan minimal 2 link sumber belajar tambahan berupa array objek {judul, url}.
-        
-        Berikan respon dalam format JSON yang valid.
-      `;
-
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const responseText = response.text;
     return res.status(200).json(JSON.parse(responseText));
   } catch (error) {
     console.error("Gemini Error:", error);
