@@ -11,8 +11,14 @@ export async function generateRPM(data: RPMData): Promise<RPMResult> {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Gagal menghubungi server.");
+      let errorMessage = "Gagal menghubungi server.";
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        errorMessage = `Server Error (${response.status}): Silakan periksa konfigurasi API Key di Vercel.`;
+      }
+      throw new Error(errorMessage);
     }
 
     return await response.json() as RPMResult;
