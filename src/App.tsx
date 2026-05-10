@@ -23,11 +23,14 @@ import {
   Info,
   Image as ImageIcon,
   Video,
-  Link as LinkIcon
+  Link as LinkIcon,
+  FileCode
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { asBlob } from 'html-docx-js-typescript';
+import { saveAs } from 'file-saver';
 import { RPMData, RPMResult } from './types';
 import { generateRPM } from './services/geminiService';
 
@@ -111,6 +114,44 @@ export default function App() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownloadWord = async () => {
+    if (!printRef.current) return;
+
+    // Create a clone of the print area to modify for Word export
+    const content = printRef.current.innerHTML;
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>RPM - ${formData.materi}</title>
+          <style>
+            body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.5; color: black; }
+            table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+            th, td { border: 1px solid black; padding: 8px; text-align: left; vertical-align: top; }
+            th { background-color: #f2f2f2; font-bold; }
+            h1 { text-align: center; font-size: 16pt; margin-bottom: 20px; text-decoration: underline; }
+            h2 { font-size: 13pt; margin-top: 20px; color: #1a365d; border-bottom: 1px solid #eee; }
+            .no-print { display: none !important; }
+            .bg-blue-600 { background-color: #3b82f6 !important; color: white !important; }
+            .text-center { text-align: center; }
+            .font-bold { font-weight: bold; }
+            .italic { font-style: italic; }
+            .uppercase { text-transform: uppercase; }
+            .underline { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          ${content}
+        </body>
+      </html>
+    `;
+
+    const blob = await asBlob(htmlContent);
+    saveAs(blob as Blob, `RPM_${formData.materi.replace(/\s+/g, '_')}.docx`);
   };
 
   return (
@@ -529,6 +570,12 @@ export default function App() {
                   <PenTool className="w-4 h-4" /> Edit Data
                 </button>
                 <div className="flex gap-3">
+                  <button 
+                    onClick={handleDownloadWord}
+                    className="px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-md shadow-emerald-100"
+                  >
+                    <FileText className="w-4 h-4" /> Word (.doc)
+                  </button>
                   <button 
                     onClick={handlePrint}
                     className="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 shadow-md shadow-blue-100"
